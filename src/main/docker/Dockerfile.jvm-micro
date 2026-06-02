@@ -1,0 +1,55 @@
+# ==========================================
+# Stage 1: Strip Java 25 down to a mini-JRE (Using standard JDK for jmods)
+# ==========================================
+FROM eclipse-temurin:25-jdk AS jre-minimizer
+
+USER root
+# jlink now works perfectly because this image includes the required jmods
+RUN $JAVA_HOME/bin/jlink \
+    --strip-debug \
+    --no-man-pages \
+    --no-header-files \
+    --compress=zip-9 \
+    --output /tmp/custom-java25-runtime \
+    --add-modules \
+# Core & Framework Dependencies
+java.base,\
+java.sql,\
+java.naming,\
+java.management,\
+java.instrument,\
+java.security.jgss,\
+# Quarkus / SmallRye Runtime Fixes
+jdk.zipfs,\
+jdk.unsupported,\
+jdk.management,\
+# Network & Data Processing Dependencies
+java.net.http,\
+java.security.sasl,\
+jdk.charsets
+
+# ==========================================
+# Stage 2: Final Light-weight Micro-Image (Keeping your original UBI Minimal)
+# ==========================================
+FROM registry.access.redhat.com/ubi9/ubi-minimal:latest
+
+ENV LANGUAGE='en_US:en'
+
+# 1. Copy over our ~40MB custom runtime from Stage 1
+COPY --from=jre-minimizer /tmp/custom-java25-runtime /opt/java25-runtime
+ENV PATH="/opt/java25-runtime/bin:$PATH"
+
+# 2. Copy your pre-built Quarkus app layers
+COPY --chown=185 build/quarkus-app/lib/ /deployments/lib/
+COPY --chown=185 build/quarkus-app/*.jar /deployments/
+COPY --chown=185 build/quarkus-app/app/ /deployments/app/
+COPY --chown=185 build/quarkus-app/quarkus/ /deployments/quarkus/
+
+EXPOSE 8080
+USER 185
+
+# 3. Standard Quarkus execution flags
+ENV JAVA_OPTS_APPEND="-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager"
+WORKDIR /deployments
+
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS_APPEND -jar quarkus-run.jar"]
