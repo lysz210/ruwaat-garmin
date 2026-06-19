@@ -21,21 +21,31 @@ val quarkusPlatformGroupId: String by project
 val quarkusPlatformArtifactId: String by project
 val quarkusPlatformVersion: String by project
 
-val jetstreamVersion: String by project
-val quipusMapsVersion: String by project
+val jnatsVersion: String by project
 val garminFitVersion: String by project
 
+val chapacnanBlueprintRootVerion: String by project
+val quipusMapsVersion: String by project
+
+
 dependencies {
-    implementation("com.garmin:fit:${garminFitVersion}")
-    implementation("it.lysz210.akasha.capacnan.quipus:maps:${quipusMapsVersion}")
-    implementation("io.quarkus:quarkus-smallrye-health")
-    implementation("io.quarkus:quarkus-config-yaml")
-    implementation("io.quarkus:quarkus-rest-jackson")
     implementation(enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
     implementation("io.quarkus:quarkus-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("io.quarkus:quarkus-arc")
     implementation("io.quarkus:quarkus-rest")
+    implementation("io.quarkus:quarkus-config-yaml")
+    implementation("io.quarkus:quarkus-rest-jackson")
+
+    implementation("io.quarkus:quarkus-smallrye-health")
+
+
+    implementation("io.nats:jnats:${jnatsVersion}")
+    implementation ("com.garmin:fit:${garminFitVersion}")
+
+    implementation("it.lysz210.akasha.capacnan:blueprint-root:${chapacnanBlueprintRootVerion}")
+    implementation("it.lysz210.akasha.capacnan.quipus:maps:${quipusMapsVersion}")
+
     testImplementation("io.quarkus:quarkus-junit")
     testImplementation("io.rest-assured:rest-assured")
 }

@@ -1,3 +1,22 @@
-#quarkus:
-#  http:
-#    root-path: /alidrisi
+
+quarkus:
+  devservices:
+    enabled: false
+  config:
+    locations:
+      - "${CAPACNAN_BLUEPRINT_ROOT_URI:}"
+      - "${CAPACNAN_BLUEPRINT_GEO_URI:}"
+
+nats:
+  connection:
+    url: "nats://localhost:4222"
+
+'%dev':
+  quarkus:
+    http:
+      port: 7080
+    log:
+      #      level: DEBUG
+      category:
+        "io.quarkus.rest.client.reactive":
+          level: DEBUG
