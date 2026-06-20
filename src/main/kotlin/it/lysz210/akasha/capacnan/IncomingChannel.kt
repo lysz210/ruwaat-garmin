@@ -24,8 +24,14 @@ interface IncomingChannel<T: MessageLite> {
 
                 onMessage(payload)
                     .subscribe().with(
-                        { Log.info("Successfully processed fit for activity.") },
-                        { error -> Log.error("Failed to process fit", error) }
+                        {
+                            message.ack()
+                            Log.info("Successfully processed fit for activity.")
+                        },
+                        { error ->
+                            message.nak()
+                            Log.error("Failed to process fit", error)
+                        }
                     )
             }
         }

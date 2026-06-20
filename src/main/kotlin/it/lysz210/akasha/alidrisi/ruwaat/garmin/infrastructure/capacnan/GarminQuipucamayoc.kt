@@ -29,8 +29,8 @@ class GarminQuipucamayoc {
     fun tie(entry: ActivityPoint): ActivityEntry =
         activityEntry {
             activityId = activityId {
-                provider = "intervals"
-                id = entry.activityId.value
+                provider = entry.activityId.provider
+                id = entry.activityId.id
             }
             if (entry.hasGps()) {
                 latlng = latLng {

@@ -23,7 +23,10 @@ class FitsChannel (
     override fun onMessage(payload: ActivityFitSource): Uni<Void> =
         fitService.processFit(
             FitSourceInfo(
-                activitiId = payload.activityId.let { ActivityId("${it.provider}.${it.id}") },
+                activitiId = payload.activityId.let { ActivityId(
+                    provider = it.provider,
+                    id = it.id
+                ) },
                 uri = URI.create(payload.uri)
             )
         )

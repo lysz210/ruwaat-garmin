@@ -53,7 +53,7 @@ class FitFilesStore (
 
     fun get(source: FitSourceInfo): Uni<NatsObject> {
         return objectStore().map { store ->
-            val objectName = source.uri.path.substring(1)
+            val objectName = source.uri.path
             val zipFile = ByteArrayOutputStream()
             val objectInfo = store.get(objectName, zipFile)
             val fitFile = ByteArrayOutputStream()
@@ -61,7 +61,6 @@ class FitFilesStore (
             GZIPInputStream(ByteArrayInputStream(zipFile.toByteArray())).use {
                 it.copyTo(fitFile)
             }
-            Files.write(Paths.get("a.fit"), zipFile.toByteArray())
             NatsObject(
                 info = objectInfo,
                 data = fitFile.toByteArray(),
